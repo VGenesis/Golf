@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.io.File;
 import java.io.FileReader;
 
+import input.Mouse;
 import math.Point;
 import objects.Ball;
 import objects.Grid;
@@ -13,6 +14,8 @@ public class Level {
 	public Ball ball;
 	public Grid grid;
 	public Hole hole;
+
+	private Mouse mouse;
 	
 	public Level() {
 		this.ball = new Ball(0, 0);
@@ -58,12 +61,15 @@ public class Level {
 				}
 			}
 			
-			this.grid.init();
-			this.ball.init();
-			this.hole.init();
 		}catch(Exception e) {
 			System.err.println(e.getMessage());
 		}
+	}
+	
+	public void init() {
+		this.grid.init();
+		this.ball.init();
+		this.hole.init();
 	}
 	
 	public void update(int framerate) {

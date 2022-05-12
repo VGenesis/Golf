@@ -17,7 +17,7 @@ public class Display extends Canvas implements Runnable{
 	private JFrame frame;
 	private Thread thread;
 	private static String title = "Golf";
-	public final static int screenWidth = 640;
+	public final static int screenWidth = 576;
 	public final static int screenHeight = 960;
 	public static final int FPS = 60;
 	private static boolean running = false;
@@ -104,6 +104,7 @@ public class Display extends Canvas implements Runnable{
 		
 		level = new Level();
 		level.loadLevel(level1path);
+		level.init();
 	}
 
 	private MouseStatus ms = MouseStatus.READY;
@@ -125,6 +126,7 @@ public class Display extends Canvas implements Runnable{
 				}
 				mouseTemp = mouse.getPosition();
 			}
+			
 		}
 	}
 	

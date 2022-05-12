@@ -14,7 +14,7 @@ public class Ball {
 	private Point velocity;
 	private double dampening;
 	private boolean hit;
-	private boolean active;
+	public boolean active;
 	
 	public BufferedImage image;
 	public final String imageFilepath = "/assets/sprites/sprBall.png";

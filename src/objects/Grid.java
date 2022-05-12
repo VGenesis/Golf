@@ -1,5 +1,6 @@
 package objects;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -25,7 +26,10 @@ public class Grid {
 	private ArrayList<Obstacle> obstacles;
 	
 	private BufferedImage[][] terrainTexture;
+	private int[][] bitmap;
+	
 	private String tilesetPath = "/assets/sprites/sprTiles.png";
+	private String tilesetBitmapPath = "/assets/sprites/sprTilesBitmap.png";
 	
 	public Grid() {
 		this.gridDimensions = new Point(Display.screenWidth/ this.gridSize, Display.screenHeight / this.gridSize);
@@ -47,7 +51,9 @@ public class Grid {
 			this.addTerrain((int) gridDimensions.x, i);
 		}
 		
+		this.loadBitmap();
 		this.getTerrain();
+		
 	}
 	
 	public void addTerrain(int posX, int posY) {
@@ -57,8 +63,11 @@ public class Grid {
 	}
 	
 	public void addObstacle(int posX, int posY, int sizeX, int sizeY) {
-		if(sizeX == sizeY) this.addBlock(posX, posY, sizeX);
-		else this.obstacles.add(new Obstacle(posX, posY, sizeX, sizeY));
+		for(int i = 0; i < sizeX; i++) {
+			for(int j = 0; j < sizeY; j++) {
+				this.addTerrain(posX + i, posY + j);
+			}
+		}
 	}
 	
 	public void addBlock(int posX, int posY, int size) {
@@ -91,32 +100,61 @@ public class Grid {
 		
 		int bitmapIndex = 0;
 		bitmapIndex += (res[0][0]? 1 : 0) + (res[0][1]? 2 : 0) + (res[0][2]? 4 : 0);
-		bitmapIndex += (res[1][0]? 8 : 0) + (res[1][2]? 16 : 0);
-		bitmapIndex += (res[2][0]? 32 : 0) + (res[2][1]? 64 : 0) + (res[2][2]? 128 : 0);
+		bitmapIndex += (res[1][0]? 8 : 0) + (res[1][1]? 16 : 0) + (res[1][2]? 32 : 0);
+		bitmapIndex += (res[2][0]? 64 : 0) + (res[2][1]? 128 : 0) + (res[2][2]? 256 : 0);
 		
 		return bitmapIndex;
 	}
+
+	private void loadBitmap() {
+		ImageUtils iu = new ImageUtils();
+		BufferedImage bitmapImage = iu.loadImage(tilesetBitmapPath);
+		this.bitmap = new int[bitmapImage.getWidth() / 3][bitmapImage.getHeight() / 3];
+		for(int j = 0; j < bitmapImage.getWidth() / 3; j++) {
+			for(int i = 0; i < bitmapImage.getHeight() / 3; i++) {
+				BufferedImage bitmapTile = bitmapImage.getSubimage(i * 3, j * 3, 3, 3);
+				
+				bitmap[i][j] = 0;
+				
+				Color c1 = new Color(bitmapTile.getRGB(0, 0));
+				Color c2 = new Color(bitmapTile.getRGB(1, 0));
+				Color c3 = new Color(bitmapTile.getRGB(2, 0));
+				bitmap[i][j] += (c1.getRed() == c1.getGreen() && c1.getGreen() == c1.getBlue() && c1.getBlue() == 0)? 1 : 0;
+				bitmap[i][j] += (c2.getRed() == c2.getGreen() && c2.getGreen() == c2.getBlue() && c2.getBlue() == 0)? 2 : 0;
+				bitmap[i][j] += (c3.getRed() == c3.getGreen() && c3.getGreen() == c3.getBlue() && c3.getBlue() == 0)? 4 : 0;
+
+				c1 = new Color(bitmapTile.getRGB(0, 1));
+				c2 = new Color(bitmapTile.getRGB(1, 1));
+				c3 = new Color(bitmapTile.getRGB(2, 1));
+				bitmap[i][j] += (c1.getRed() == c1.getGreen() && c1.getGreen() == c1.getBlue() && c1.getBlue() == 0)? 8 : 0;
+				bitmap[i][j] += (c2.getRed() == c2.getGreen() && c2.getGreen() == c2.getBlue() && c2.getBlue() == 0)? 16 : 0;
+				bitmap[i][j] += (c3.getRed() == c3.getGreen() && c3.getGreen() == c3.getBlue() && c3.getBlue() == 0)? 32 : 0;
+
+				c1 = new Color(bitmapTile.getRGB(0, 2));
+				c2 = new Color(bitmapTile.getRGB(1, 2));
+				c3 = new Color(bitmapTile.getRGB(2, 2));
+				bitmap[i][j] += (c1.getRed() == c1.getGreen() && c1.getGreen() == c1.getBlue() && c1.getBlue() == 0)? 64 : 0;
+				bitmap[i][j] += (c2.getRed() == c2.getGreen() && c2.getGreen() == c2.getBlue() && c2.getBlue() == 0)? 128 : 0;
+				bitmap[i][j] += (c3.getRed() == c3.getGreen() && c3.getGreen() == c3.getBlue() && c3.getBlue() == 0)? 256 : 0;
+			}
+		}
+	}
 	
-	//   1    2    4
-	
-	//   8    x   16
-	
-	//  32   64  128
-	
-	private int[][] bitmap = {
-			{127,  63,  31, 159, 223},
-			{111,  47,   7, 151, 215},
-			{107,  41,   0, 148, 214},
-			{235, 233, 224, 244, 246},
-			{251, 249, 248, 252, 254}
-	};
-	
+	private void printBitmap() {
+		for(int i = 0; i < bitmap[0].length; i++) {
+			for(int j = 0; j < bitmap.length; j++) {
+				System.out.printf("%3d ", bitmap[j][i]);
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
 	
 	private Point findTile(int index) {
 		int i, j;
-		for(i = 0; i < bitmap.length; i++) {
-			for(j = 0; j < bitmap[0].length; j++) {
-				if(index == bitmap[i][j]) return new Point(i, j);
+		for(j = 0; j < bitmap.length; j++) {
+			for(i = 0; i < bitmap[0].length; i++) {
+				if(index == bitmap[i][j]) return new Point(j, i);
 			}
 		}
 		return null;
@@ -135,6 +173,8 @@ public class Grid {
 		this.terrainTexture = new BufferedImage[(int) gridDimensions.x][(int) gridDimensions.y];
 		ImageUtils iu = new ImageUtils();
 		BufferedImage tileset = iu.loadImage(tilesetPath);
+		
+		this.loadBitmap();
 		
 		for(int i = 0; i < this.gridDimensions.x; i++) {
 			for(int j = 0; j < this.gridDimensions.y; j++) {
